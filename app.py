@@ -1,45 +1,29 @@
-from flask import Flask
-import psycopg2
-import os
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
 
-def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.environ.get("DB_HOST"),
-        database=os.environ.get("DB_NAME"),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD")
-    )
-    return conn
-
-
 @app.route("/")
 def home():
-    return "Flask Docker Application 🚀"
+    return jsonify({
+        "message": "Hello from Flask!",
+        "status": "running"
+    })
 
 
-@app.route("/db")
-def database_test():
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "healthy"
+    }), 200
 
-    conn = get_db_connection()
 
-    cur = conn.cursor()
-
-    cur.execute("SELECT version();")
-
-    db_version = cur.fetchone()
-
-    cur.close()
-    conn.close()
-
-    return f"Database Connected: {db_version}"
+@app.route("/ready")
+def ready():
+    return jsonify({
+        "status": "ready"
+    }), 200
 
 
 if __name__ == "__main__":
-    app.run(
-        host="0.0.0.0",
-        port=5000,
-        debug=True
-    )
+    app.run(host="0.0.0.0", port=5000)
