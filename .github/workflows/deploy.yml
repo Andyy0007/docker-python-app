@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  test:
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,3 +35,50 @@ jobs:
 
       - name: Push Docker image
         run: docker push anadi07/flaskapp:${{ github.sha }}
+
+  deploy:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Kind cluster
+        uses: helm/kind-action@v1.12.0
+
+      - name: Check Kubernetes cluster
+        run: kubectl get nodes
+
+      - name: Create Kubernetes Secret
+        run: kubectl apply -f secret.yaml
+
+      - name: Create ConfigMap
+        run: kubectl apply -f configmap.yaml
+
+      - name: Deploy PostgreSQL
+        run: kubectl apply -f postgres-deployment.yaml
+
+      - name: Deploy PostgreSQL Service
+        run: kubectl apply -f postgres-service.yaml
+
+      - name: Wait for PostgreSQL
+        run: kubectl rollout status deployment/postgres --timeout=120s
+
+      - name: Deploy Flask
+        run: kubectl apply -f deployment.yaml
+
+      - name: Update Flask image
+        run: kubectl set image deployment/flask-app flask=anadi07/flaskapp:${{ github.sha }}
+
+      - name: Deploy Flask Service
+        run: kubectl apply -f service.yaml
+
+      - name: Wait for Flask rollout
+        run: kubectl rollout status deployment/flask-app --timeout=120s
+
+      - name: Show Kubernetes resources
+        run: kubectl get pods,svc,deployments
+
+      - name: Verify Flask pods
+        run: kubectl get pods -l app=flask
