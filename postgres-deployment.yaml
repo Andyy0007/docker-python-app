@@ -1,8 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: postgres
+  labels:
+    app: postgres
 
 spec:
   replicas: 1
@@ -29,7 +30,39 @@ spec:
               value: mydatabase
 
             - name: POSTGRES_USER
-              value: admin
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_USER
 
             - name: POSTGRES_PASSWORD
-              value: password123
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_PASSWORD
+
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - admin
+                - -d
+                - mydatabase
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - admin
+                - -d
+                - mydatabase
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3

@@ -27,13 +27,19 @@ spec:
 
           env:
             - name: DB_HOST
-              value: postgres-service
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-config
+                  key: DB_HOST
 
             - name: DB_PORT
               value: "5432"
 
             - name: DB_NAME
-              value: mydatabase
+              valueFrom:
+                configMapKeyRef:
+                  name: flask-config
+                  key: DB_NAME
 
             - name: DB_USER
               value: admin
