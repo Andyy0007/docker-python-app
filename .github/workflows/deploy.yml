@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t anadi07/flaskapp:latest .
+        run: docker build -t anadi07/flaskapp:${{ github.sha }} .
 
       - name: Push Docker image
-        run: docker push anadi07/flaskapp:latest
+        run: docker push anadi07/flaskapp:${{ github.sha }}
