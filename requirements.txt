@@ -1,3 +1,4 @@
 Flask
 psycopg2-binary
 python-dotenv
+appdynamics==26.7.1.9060
