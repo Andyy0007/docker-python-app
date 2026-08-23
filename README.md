@@ -1,4 +1,4 @@
-# Dockerized Flask Application with Kubernetes, CI/CD & AppDynamics
+# Dockerized Flask Application with Kubernetes, CI/CD & Monitoring
 
 A production-style Python Flask REST API demonstrating **containerization, Kubernetes orchestration, PostgreSQL integration, CI/CD automation, configuration management, health checks, and application observability using AppDynamics**.
 
