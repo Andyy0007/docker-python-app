@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: flask-app
+  namespace: dev
 
 spec:
   replicas: 2
@@ -25,6 +26,14 @@ spec:
           ports:
             - containerPort: 5000
 
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
           env:
             - name: DB_HOST
               valueFrom:
@@ -42,10 +51,16 @@ spec:
                   key: DB_NAME
 
             - name: DB_USER
-              value: admin
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_USER
 
             - name: DB_PASSWORD
-              value: password123
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_PASSWORD
 
           readinessProbe:
             httpGet:
