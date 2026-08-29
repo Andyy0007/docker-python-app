@@ -1,9 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   name: postgres
-  labels:
-    app: postgres
 
 spec:
   replicas: 1
@@ -41,18 +40,9 @@ spec:
                   name: postgres-secret
                   key: DB_PASSWORD
 
-          readinessProbe:
-            exec:
-              command:
-                - pg_isready
-                - -U
-                - admin
-                - -d
-                - mydatabase
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 5
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
 
           livenessProbe:
             exec:
@@ -66,3 +56,21 @@ spec:
             periodSeconds: 20
             timeoutSeconds: 5
             failureThreshold: 3
+
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - admin
+                - -d
+                - mydatabase
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc

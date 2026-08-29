@@ -16,8 +16,11 @@ spec:
     metadata:
       labels:
         app: flask
-
+      
     spec:
+    
+      serviceAccountName: flask-sa
+
       containers:
         - name: flask
           image: anadi07/flaskapp:latest

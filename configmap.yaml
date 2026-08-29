@@ -6,5 +6,5 @@ metadata:
   namespace: dev
 
 data:
-  DB_HOST: postgres-service
-  DB_NAME: mydatabase
+  DB_HOST: postgres-demo
+  DB_NAME: demo
